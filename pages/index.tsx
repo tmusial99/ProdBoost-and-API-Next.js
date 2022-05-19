@@ -1,4 +1,3 @@
-import { Welcome } from '../components/Welcome/Welcome';
 import { Button, Center, Text } from '@mantine/core';
 import Link from 'next/link';
 
