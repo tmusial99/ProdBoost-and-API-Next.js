@@ -26,13 +26,13 @@ export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
         opened={imageSrc !== null}
         size='lg'
       >
-        <CropImage imageSrc={imageSrc} setCroppedArea={setCroppedArea}/>
+        <CropImage imageSrc={imageSrc} setCroppedArea={setCroppedArea} sendingData={sendingData}/>
         <Group mt={20} position='center'>
           <Button disabled={sendingData} variant='outline' color='red' onClick={() => setImageSrc(null)}>Cofnij</Button>
           <Button loading={sendingData} color='green' leftIcon={<CameraPlus size={20}/>} onClick={async () => {
-            const base64cropped = generateCroppedImage(await createImage(imageSrc.imageUrl), croppedArea, 0.9);
             try{
               setSendingData(true)
+              const base64cropped = generateCroppedImage(await createImage(imageSrc.imageUrl), croppedArea, 0.8);
               const {data} = await axios.post(apiRoute, {base64: base64cropped})
               if(apiRoute === '/api/account/changePicture'){
                 await updateSession();
@@ -68,6 +68,7 @@ export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
         }}
         maxSize={5_242_880}
         accept={[MIME_TYPES.jpeg, MIME_TYPES.png, MIME_TYPES.webp]}
+        multiple={false}
       >
         {(status) => dropzoneChildren(status, theme)}
       </Dropzone>
@@ -163,7 +164,7 @@ const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) => (
   </Group>
 );
 
-function CropImage({imageSrc, setCroppedArea}:{imageSrc:any, setCroppedArea:any}){
+function CropImage({imageSrc, setCroppedArea, sendingData}:{imageSrc:any, setCroppedArea:any, sendingData:boolean}){
   const [crop, setCrop] = useState({x:0, y:0});
   const [zoom, setZoom] = useState(1);
 
@@ -179,8 +180,8 @@ function CropImage({imageSrc, setCroppedArea}:{imageSrc:any, setCroppedArea:any}
         crop={crop}
         zoom={zoom}
         zoomSpeed={0.3}
-        onCropChange={setCrop}
-        onZoomChange={setZoom}
+        onCropChange={sendingData ? () => {} : setCrop}
+        onZoomChange={sendingData ? () => {} : setZoom}
         onCropComplete={(croppedArea, croppedAreaPixels) => setCroppedArea(croppedAreaPixels)}
         objectFit={imageSrc?.imageWidth >= imageSrc?.imageHeight ? 'vertical-cover' : 'horizontal-cover'}
       />
