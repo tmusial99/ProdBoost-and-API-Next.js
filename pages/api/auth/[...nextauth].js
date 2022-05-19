@@ -54,8 +54,9 @@ const createOptions = (req) => ({
             if(user){
                 token.user = user;
             }
-            if(req.url === `${process.env.NEXTAUTH_URL}/api/auth/session?update` ||
-            req.url === '/api/auth/session?update'){
+            if(req.query.update){
+            // req.url === `${process.env.NEXTAUTH_URL}/api/auth/session?update` ||
+            // req.url === '/api/auth/session?update'
                 const {client, db} = await getDatabase();
                 const newUserData = await db.collection('users').findOne({_id: ObjectId(token.user._id)})
                 const newCompanyData = await db.collection('companies').findOne({_id: ObjectId(newUserData.companyId)})

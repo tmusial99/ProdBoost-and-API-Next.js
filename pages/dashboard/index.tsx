@@ -15,7 +15,7 @@ export default function Dashboard(){
     if(status === 'authenticated') return (
         <>
             <Navbar/>
-            {true && (
+            {session.user.passwordWarning && (
                 <Group position="center">
                     <Alert icon={<AlertCircle size={16} />} title="Uwaga!" color="red" radius="lg" mt={10} mx={10} sx={{
                         maxWidth: '400px',
