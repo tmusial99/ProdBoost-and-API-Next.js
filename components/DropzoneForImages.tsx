@@ -54,7 +54,6 @@ export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
       <Dropzone
         onDrop={async (files) => {
           const imageDataUrl = await readFile(files[0]);
-          console.log(imageDataUrl)
           setImageSrc(imageDataUrl);
         }}
         onReject={(files) => {
