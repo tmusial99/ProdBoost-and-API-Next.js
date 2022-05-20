@@ -1,6 +1,7 @@
 import axiosDefault from "axios";
+import { useRouter } from "next/router";
 
 const axios = axiosDefault.create({
-    baseURL: process.env.AXIOS_URL,
+   
 });
 export default axios

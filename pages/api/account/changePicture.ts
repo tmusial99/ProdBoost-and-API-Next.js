@@ -15,7 +15,7 @@ function getRandomInt(min:number, max:number) {
 export const config = {
     api:{
         bodyParser:{
-            sizeLimit: '6mb'
+            sizeLimit: '8mb'
         }
     }
 }
@@ -34,6 +34,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             return;
         }
         const validBase64 = (base64 as string).split(';base64,').pop() as string
+        
         const file = await sharp(Buffer.from(validBase64, 'base64'))
             .resize(500, 500)
             .webp()

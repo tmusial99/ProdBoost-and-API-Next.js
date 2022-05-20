@@ -14,6 +14,10 @@ export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
   const [croppedArea, setCroppedArea] = useState<any>(null);
   const [sendingData, setSendingData] = useState(false);
 
+  useEffect(() => {
+    console.log(imageSrc)
+    console.log(croppedArea)
+  },[imageSrc, croppedArea])
   return (
     <>
       <Modal
