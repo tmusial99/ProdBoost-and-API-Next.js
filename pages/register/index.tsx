@@ -254,13 +254,13 @@ function WhatsYourName(props: { nextStep: () => void, setGlobalState: any}){
     const {errors, anyError} = useFormValidation(form, {
         firstName:{
             required: true,
-            minLength: [2, 'Za mało'],
-            maxLength: [25, 'Za dużo']
+            minLength: [2, 'Imię musi mieć minimalnie 2 znaki.'],
+            maxLength: [25, 'Imię musi mieć maksymalnie 25 znaków.']
         },
         surname:{
             required: true,
-            minLength: [2, 'Za mało'],
-            maxLength: [25, 'Za dużo']
+            minLength: [2, 'Nazwisko musi mieć minimalnie 2 znaki.'],
+            maxLength: [25, 'Nazwisko musi mieć maksymalnie 25 znaków.']
         }
     })
     
@@ -334,7 +334,7 @@ function CompanyDetails(props: { nextStep: () => void, setGlobalState: any, glob
     const {errors, anyError} = useFormValidation(form, {
         companyName:{
             required: true,
-            minLength: [3, 'Nazwa firmy musi mieć minimalnie 6 znaków.'],
+            minLength: [3, 'Nazwa firmy musi mieć minimalnie 3 znaki.'],
             maxLength: [25, 'Nazwa firmy musi mieć maksymalnie 25 znaków.']
         }
     })

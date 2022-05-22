@@ -44,5 +44,3 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(500).json('Route not valid');
     }
 }
-
-//TODO: sprawdzić jeszcze czy hasło z req jest takie samo jak te z mongodb

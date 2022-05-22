@@ -140,6 +140,5 @@ function Heading(){
             </Title>
             <Title order={3} align='center' px={10}>Panel logowania</Title>
         </>
-        
     )
 }
