@@ -1,10 +1,9 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 import getDatabase from "../../../lib/getDatabase";
 import s3client from "../../../lib/s3client";
-import { IMaterial } from "../../../types/items";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if(req.method === 'POST'){

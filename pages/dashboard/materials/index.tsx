@@ -1,11 +1,11 @@
-import { Anchor, Button, Container, Group, Image, ScrollArea, Table, Text, TextInput, Title, UnstyledButton } from "@mantine/core";
+import { Button, Container, Group, Image, ScrollArea, Table, Text, TextInput, Title, UnstyledButton } from "@mantine/core";
 import { createNewSortInstance, sort } from "fast-sort";
 import { ObjectId } from "mongodb";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import Link from "next/link";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { CirclePlus, Search, SortAscending, SortAscendingNumbers, SortDescending, SortDescendingNumbers } from "tabler-icons-react";
+import { CirclePlus, Search, SortAscending, SortDescending } from "tabler-icons-react";
 import Head from "../../../components/Head";
 import Navbar from "../../../components/Navbar";
 import Navigation from "../../../components/Navigation";

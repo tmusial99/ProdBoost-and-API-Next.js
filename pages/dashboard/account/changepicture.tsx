@@ -1,9 +1,8 @@
-import { Alert, Avatar, Box, Button, Center, Container, Group, LoadingOverlay, Modal, Paper, PasswordInput, Text, Title } from "@mantine/core"
-import { useSetState } from "@mantine/hooks";
+import { Avatar, Box, Button, Center, Container, Group, Paper, Title } from "@mantine/core"
 import { AxiosError } from "axios";
-import { signOut, useSession } from "next-auth/react";
-import { FormEvent, useEffect, useState } from "react";
-import { AlertCircle, Camera, CameraSelfie, Key, Login, Trash } from "tabler-icons-react";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { Trash } from "tabler-icons-react";
 import DropzoneForImages from "../../../components/DropzoneForImages";
 import Head from "../../../components/Head";
 import WithAuth from "../../../components/hoc/WithAuth";
@@ -11,8 +10,6 @@ import Navbar from "../../../components/Navbar"
 import Navigation from "../../../components/Navigation";
 import axios from "../../../lib/axios";
 import { updateSession } from "../../../lib/sessionHelpers";
-import useFormValidation from "../../../lib/useFormValidation";
-import { PasswordStrength } from "../../register";
 
 export default function Page(){
     return(

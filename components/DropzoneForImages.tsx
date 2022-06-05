@@ -1,7 +1,7 @@
 import { Group, Text, useMantineTheme, MantineTheme, Modal, Button } from '@mantine/core';
 import { Upload, Photo, X, Icon as TablerIcon, CameraPlus } from 'tabler-icons-react';
-import { Dropzone, DropzoneStatus, IMAGE_MIME_TYPE, MIME_TYPES } from '@mantine/dropzone';
-import { useEffect, useRef, useState } from 'react';
+import { Dropzone, DropzoneStatus, MIME_TYPES } from '@mantine/dropzone';
+import { useState } from 'react';
 import Cropper from 'react-easy-crop';
 import generateCroppedImage from '../lib/generateCroppedImage';
 import axios from '../lib/axios';
