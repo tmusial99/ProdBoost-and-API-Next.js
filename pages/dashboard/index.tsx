@@ -1,44 +1,79 @@
-import { Alert, Anchor, Box, Button, Group, PasswordInput, Text, TextInput, Title } from "@mantine/core";
+import { Alert, Anchor, Box, Button, Container, Divider, Group, PasswordInput, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useSetState } from "@mantine/hooks";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { AlertCircle } from "tabler-icons-react";
+import { useState } from "react";
+import { AlertCircle, ClipboardList, Leaf, Package, Plant, Seeding, Tools } from "tabler-icons-react";
 import Navbar from "../../components/Navbar";
 import { signIn, useSession } from "next-auth/react"
-import axios from "../../lib/axios";
-import { updateSession } from "../../lib/sessionHelpers";
+import Head from "../../components/Head";
 
 export default function Dashboard(){
     const {data: session, status} = useSession();
     if(status === 'loading') return null;
     if(status === 'authenticated') return (
         <>
+            <Head title='ProdBoost - Dashboard'/>
             <Navbar/>
             {session.user.passwordWarning && (
                 <Group position="center">
                     <Alert icon={<AlertCircle size={16} />} title="Uwaga!" color="red" radius="lg" mt={10} mx={10} sx={{
                         maxWidth: '400px',
                     }}>
-                        Masz nadal ustawione domyślne hasło!
-                        Zalecamy jak najszybszą zmianę.
-                        <br/>
-                        
+                        <Text size="sm">Masz nadal ustawione domyślne hasło! Zalecamy jak najszybszą zmianę.</Text>
                         <Link href='/dashboard/account/changepassword'>
                             <Anchor href='/dashboard/account/changepassword'>
                                 Zmień hasło
                             </Anchor>
                         </Link>
-                       
                     </Alert>
                 </Group>
-            
             )}
+            <Container>
+                <Group direction='column' mt={30} grow>
+                    <Divider size='lg' labelPosition='center' label={
+                        <>
+                            <Tools/>
+                            <Text ml={10} size='lg'>Narzędzia</Text>
+                        </>
+                    }/>
+                    <Group position="center">
+                        {session.user.permissions.includes('materials') && (
+                            <Link href='/dashboard/materials' passHref>
+                                <Button component='a' size='xl' radius='xl' color='teal' leftIcon={<Leaf/>}>Materiały</Button>
+                            </Link>
+                            
+                        )}
+                        {session.user.permissions.includes('components') && (
+                            <Link href='/dashboard/components' passHref>
+                                <Button component='a' size='xl' radius='xl' color='green' leftIcon={<Seeding/>}>Komponenty</Button>
+                            </Link>
+                        )}
+                        {session.user.permissions.includes('products') && (
+                            <Link href='/dashboard/products' passHref>
+                                <Button component='a' size='xl' radius='xl' color='lime' leftIcon={<Plant/>}>Produkty</Button>
+                            </Link>
+                        )}
+                        {session.user.permissions.includes('packing') && (
+                            <Link href='/dashboard/packing' passHref>
+                                <Button component='a' size='xl' radius='xl' color='blue' leftIcon={<Package/>}>Pakowanie</Button>
+                            </Link>
+                        )}
+                        {session.user.permissions.includes('orders') && (
+                            <Link href='/dashboard/orders' passHref>
+                                <Button component='a' size='xl' radius='xl' color='violet' leftIcon={<ClipboardList/>}>Zamówienia</Button>
+                            </Link>
+                        )}
+                    </Group>  
+                </Group>
+                  
+            </Container>
         </>
     )
 
     return(
         <>
+            <Head title='ProdBoost - Zaloguj się'/>
             <Navbar/>
             <Heading/>
             <Group position="center">

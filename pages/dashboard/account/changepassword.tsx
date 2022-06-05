@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import { signOut } from "next-auth/react";
 import { FormEvent, useState } from "react";
 import { AlertCircle, Key, Login } from "tabler-icons-react";
+import Head from "../../../components/Head";
 import WithAuth from "../../../components/hoc/WithAuth";
 import Navbar from "../../../components/Navbar"
 import Navigation from "../../../components/Navigation";
@@ -81,6 +82,7 @@ function ChangePassword(){
     }
     return(
         <>
+            <Head title='ProdBoost - Zmień hasło'/>
             <Navbar/>
             <Container>
                 <LoadingOverlay visible={sendingData}/>

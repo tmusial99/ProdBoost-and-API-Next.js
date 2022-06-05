@@ -9,7 +9,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const {client, db} = await getDatabase()
 
         const checkExisting = await db.collection('users').findOne({username: username});
-        client.close();
+        await client.close();
         res.status(200).json(checkExisting ? 'Not valid' : 'Valid');
     }
     else{

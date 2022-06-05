@@ -23,22 +23,44 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         const {client, db} = await getDatabase()
+
         const user = await db.collection('users').findOne({_id: new ObjectId(session.user._id)})
-        const isPasswordCorrect = await compare(actualPassword, user?.hashedPassword)
-        if(!isPasswordCorrect){
-            client.close()
-            res.status(400).json('invalid password');
-            return;
+
+        if(user?.hashedPassword){
+            const isPasswordCorrect = await compare(actualPassword, user?.hashedPassword)
+            if(!isPasswordCorrect){
+                await client.close()
+                res.status(400).json('invalid password');
+                return;
+            }
+
+            await db.collection('users').updateOne(
+                {...user},
+                {$set: {hashedPassword: await hash(password, 12)}}    
+            )
+
+            await client.close();
+            res.status(200).json('success');
         }
+        else{
+            const isPasswordCorrect = actualPassword === user?.initialPassword
+            if(!isPasswordCorrect){
+                await client.close()
+                res.status(400).json('invalid password');
+                return;
+            }
 
-        const response = await db.collection('users').updateOne(
-            {...user},
-            {$set: {hashedPassword: await hash(password, 12)}}    
-        )
+            await db.collection('users').updateOne(
+                {...user},
+                {
+                    $unset: {initialPassword: '', passwordWarning: ''},
+                    $set: {hashedPassword: await hash(password, 12)}
+                }
+            )
 
-        client.close();
-
-        response ? res.status(200).json('success') : res.status(400).json('error');
+            await client.close();
+            res.status(200).json('success');
+        }
     }
     else{
         res.status(500).json('Route not valid');

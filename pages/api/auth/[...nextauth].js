@@ -26,7 +26,7 @@ const createOptions = (req) => ({
                 }
 
                 if(user.initialPassword){
-                    const isValid = credentials.password === user.initialPassword ? true : false;
+                    const isValid = credentials.password === user.initialPassword;
                     if(!isValid){
                         client.close();
                         throw new Error('Invalid username or password');
@@ -35,7 +35,7 @@ const createOptions = (req) => ({
 
                 const company = await db.collection('companies').findOne({_id: ObjectId(user.companyId)})
 
-                client.close();
+                await client.close();
                 return {
                     _id: user._id, 
                     companyId: user.companyId,
@@ -60,7 +60,7 @@ const createOptions = (req) => ({
                 const {client, db} = await getDatabase();
                 const newUserData = await db.collection('users').findOne({_id: ObjectId(token.user._id)})
                 const newCompanyData = await db.collection('companies').findOne({_id: ObjectId(newUserData.companyId)})
-                client.close();
+                await client.close();
 
                 token.user = {
                     _id: newUserData._id, 

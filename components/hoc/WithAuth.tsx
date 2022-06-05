@@ -23,24 +23,22 @@ export default function WithAuth({children, withRole, withPermission}:Props){
         else return <RouterComponent/>
     }
 
-    function checkUserPermissions(role: typeof withPermission){
-        if(session?.user.permissions.includes(role ? role : '')) return children
+    function checkUserPermissions(role: string){
+        if(session?.user.permissions.includes(role)) return children
         else return <RouterComponent/>
     }
     if(withPermission){
         switch(withPermission){
             case 'materials':
-                checkUserPermissions('materials');
+                return checkUserPermissions('materials');
             case 'components':
-                checkUserPermissions('components')
+                return checkUserPermissions('components');
             case 'products':
-                checkUserPermissions('products')
+                return checkUserPermissions('products');
             case 'packing':
-                checkUserPermissions('packing')
+                return checkUserPermissions('packing');
             case 'orders':
-                checkUserPermissions('orders')
-            default:
-                return <RouterComponent/>
+                return checkUserPermissions('orders');
         }
     }
     

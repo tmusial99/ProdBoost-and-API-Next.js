@@ -6,7 +6,7 @@ export default function Navigation({items}: {items: Array<{title:string, href:st
         <Breadcrumbs my={20}>
             {items.map((item, index) => (
                 <Link href={item.href} key={index}>
-                    <Anchor href={item.href}>
+                    <Anchor href={item.href} sx={{textOverflow: "ellipsis", whiteSpace: 'nowrap', overflow: 'hidden'}}>
                         {item.title}
                     </Anchor>
                 </Link>

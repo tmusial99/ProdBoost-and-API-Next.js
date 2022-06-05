@@ -1,14 +1,16 @@
-import { Alert, Box, Button, Container, Group, LoadingOverlay, Modal, PasswordInput, Text, Title } from "@mantine/core"
+import { Alert, Avatar, Box, Button, Center, Container, Group, LoadingOverlay, Modal, Paper, PasswordInput, Text, Title } from "@mantine/core"
 import { useSetState } from "@mantine/hooks";
 import { AxiosError } from "axios";
-import { signOut } from "next-auth/react";
-import { FormEvent, useState } from "react";
-import { AlertCircle, Camera, CameraSelfie, Key, Login } from "tabler-icons-react";
+import { signOut, useSession } from "next-auth/react";
+import { FormEvent, useEffect, useState } from "react";
+import { AlertCircle, Camera, CameraSelfie, Key, Login, Trash } from "tabler-icons-react";
 import DropzoneForImages from "../../../components/DropzoneForImages";
+import Head from "../../../components/Head";
 import WithAuth from "../../../components/hoc/WithAuth";
 import Navbar from "../../../components/Navbar"
 import Navigation from "../../../components/Navigation";
 import axios from "../../../lib/axios";
+import { updateSession } from "../../../lib/sessionHelpers";
 import useFormValidation from "../../../lib/useFormValidation";
 import { PasswordStrength } from "../../register";
 
@@ -26,24 +28,45 @@ const items = [
 ]
 
 function ChangePicture(){
-    const [showAlert, setShowAlert] = useSetState({
-        show: false,
-        msg: ''
-    })
+    const {data:session} = useSession();
+    const [deletingPhoto, setDeletingPhoto] = useState(false);
+
+    async function deletePicture(e: any){
+        e.preventDefault();
+        setDeletingPhoto(true);
+        try{
+            const res = await axios.get('/api/account/deletePicture')
+        }
+        catch(e){
+            const error = e as AxiosError
+            console.log(error)
+            setDeletingPhoto(false);
+            return;
+        }
+        await updateSession()
+        setDeletingPhoto(false);
+    }
 
     return(
         <>
+            <Head title='ProdBoost - Zdjęcie profilowe'/>
             <Navbar/>
             <Container>
                 <Navigation items={items}/>
-                <Title order={1} mb={10} align='center'>Zmień zdjęcie profilowe</Title>
+                <Title order={1} mb={10} align='center'>Twoje aktualne zdjęcie profilowe</Title>
+                <Center>
+                    <Paper shadow="lg" radius="xl" withBorder style={{flexGrow:1, maxWidth:400}} sx={(theme) => ({
+                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : "white"
+                    })}>
+                        <Group direction="column" position="center" mt={20} mb={20}>
+                            <Avatar src={session?.user.image_url} radius={100} size={200}/>
+                            <Button leftIcon={<Trash/>} radius='xl' size='md' variant='outline' disabled={!session?.user.image_url} loading={deletingPhoto} onClick={(e: any) => deletePicture(e)}>Usuń obecne zdjęcie</Button>
+                        </Group>
+                    </Paper>
+                </Center>
+                <Title order={1} mt={30} align='center'>Zmień zdjęcie profilowe</Title>
                 <Group grow={true} align='center' direction="column">
-                    {showAlert.show && (
-                        <Alert icon={<AlertCircle size={16} />} title="Błąd!" color="red" withCloseButton variant="outline" onClose={() => setShowAlert({show:false})}>
-                            {showAlert.msg}
-                        </Alert>
-                    )}
-                    <Box mt={20}>
+                    <Box mt={10}>
                         <DropzoneForImages apiRoute='/api/account/changePicture'/>
                     </Box>
                 </Group>

@@ -2,11 +2,23 @@ import { GetServerSidePropsContext } from 'next';
 import { useState } from 'react';
 import { AppProps } from 'next/app';
 import { getCookie, setCookies } from 'cookies-next';
-import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
 import '../styles/styles.css'
 import { SessionProvider } from 'next-auth/react';
+import { Router } from 'next/router';
+import ProgressBar from "@badrap/bar-of-progress";
+import Footer from '../components/Footer';
+
+const progress = new ProgressBar({
+  size: 3,
+  color: '#0075fa',
+  delay: 100
+});
+
+Router.events.on('routeChangeStart', () => progress.start()); 
+Router.events.on('routeChangeComplete', () => progress.finish()); 
+Router.events.on('routeChangeError', () => progress.finish()); 
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -21,17 +33,12 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 
   return (
     <>
-      <Head>
-        <title>Mantine next example</title>
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-        <link rel="shortcut icon" href="/favicon.svg" />
-      </Head>
-
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
           <NotificationsProvider>
             <SessionProvider session={pageProps?.session}>
               <Component {...pageProps} />
+              <Footer/>
             </SessionProvider>
           </NotificationsProvider>
         </MantineProvider>

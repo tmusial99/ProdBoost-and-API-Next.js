@@ -8,49 +8,62 @@ import axios from '../lib/axios';
 import { AxiosError } from 'axios';
 import { updateSession } from '../lib/sessionHelpers';
 
-export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
+export default function DropzoneForImages({ apiRoute, componentId, callback}: { apiRoute: string, componentId?: string, callback?: (url: string) => void }) {
   const theme = useMantineTheme();
   const [imageSrc, setImageSrc] = useState<any>(null);
   const [croppedArea, setCroppedArea] = useState<any>(null);
   const [sendingData, setSendingData] = useState(false);
 
-  useEffect(() => {
-    console.log(imageSrc)
-    console.log(croppedArea)
-  },[imageSrc, croppedArea])
   return (
     <>
       <Modal
-        transition='fade'
+        transition="fade"
         centered={true}
         withCloseButton={false}
         closeOnClickOutside={false}
         closeOnEscape={false}
-        onClose={()=>{}}
+        onClose={() => {}}
         opened={imageSrc !== null}
-        size='lg'
+        size="lg"
       >
-        <CropImage imageSrc={imageSrc} setCroppedArea={setCroppedArea} sendingData={sendingData}/>
-        <Group mt={20} position='center'>
-          <Button disabled={sendingData} variant='outline' color='red' onClick={() => setImageSrc(null)}>Cofnij</Button>
-          <Button loading={sendingData} color='green' leftIcon={<CameraPlus size={20}/>} onClick={async () => {
-            try{
-              setSendingData(true)
-              const base64cropped = generateCroppedImage(await createImage(imageSrc.imageUrl), croppedArea, 0.8);
-              const {data} = await axios.post(apiRoute, {base64: base64cropped})
-              if(apiRoute === '/api/account/changePicture'){
-                await updateSession();
+        <CropImage imageSrc={imageSrc} setCroppedArea={setCroppedArea} sendingData={sendingData} />
+        <Group mt={20} position="center">
+          <Button
+            disabled={sendingData}
+            variant="outline"
+            color="red"
+            onClick={() => setImageSrc(null)}
+          >
+            Cofnij
+          </Button>
+          <Button
+            loading={sendingData}
+            color="green"
+            leftIcon={<CameraPlus size={20} />}
+            onClick={async () => {
+              try {
+                setSendingData(true);
+                const base64cropped = generateCroppedImage(
+                  await createImage(imageSrc.imageUrl),
+                  croppedArea,
+                  0.8
+                ); 
+                const jsonBody = componentId ? {base64: base64cropped, componentId: componentId} : {base64: base64cropped}
+                const { data } = await axios.post(apiRoute, jsonBody);
+                if(callback) callback(data)
+                if (apiRoute === '/api/account/changePicture') {
+                  await updateSession();
+                }
+                setCroppedArea(null);
+                setImageSrc(null);
+                setSendingData(false);
+              } catch (e) {
+                const error = e as AxiosError;
+                console.dir(error);
+                setSendingData(false);
               }
-              setCroppedArea(null);
-              setImageSrc(null);
-              setSendingData(false);
-            }
-            catch(e){
-              const error = e as AxiosError
-              console.dir(error)
-              setSendingData(false);
-            }
-          }}>
+            }}
+          >
             Ustaw zdjęcie
           </Button>
         </Group>
@@ -61,12 +74,12 @@ export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
           setImageSrc(imageDataUrl);
         }}
         onReject={(files) => {
-          if(files[0].errors[0].code === 'file-invalid-type'){
-            alert('Nieobsługiwany format pliku.')
+          if (files[0].errors[0].code === 'file-invalid-type') {
+            alert('Nieobsługiwany format pliku.');
             return;
           }
-          if(files[0].errors[0].code === 'file-too-large'){
-            alert('Plik ma za duży rozmiar. Maksymalny rozmiar pliku to 5MB.')
+          if (files[0].errors[0].code === 'file-too-large') {
+            alert('Plik ma za duży rozmiar. Maksymalny rozmiar pliku to 5MB.');
             return;
           }
         }}
@@ -80,50 +93,53 @@ export default function DropzoneForImages({apiRoute}:{apiRoute:string}) {
   );
 }
 
-function readFile(file:File){
+function readFile(file: File) {
   return new Promise<{
-    imageUrl: string,
-    imageWidth: number,
-    imageHeight: number
+    imageUrl: string;
+    imageWidth: number;
+    imageHeight: number;
   }>((resolve) => {
     const reader = new FileReader();
-    reader.addEventListener('load', async () => {
-      const dimensions = await getImageDimensions(reader.result as string)
-      resolve({
-        imageUrl: reader.result as string,
-        imageWidth: dimensions.imageWidth,
-        imageHeight: dimensions.imageHeight
-      })
-    }, false);
+    reader.addEventListener(
+      'load',
+      async () => {
+        const dimensions = await getImageDimensions(reader.result as string);
+        resolve({
+          imageUrl: reader.result as string,
+          imageWidth: dimensions.imageWidth,
+          imageHeight: dimensions.imageHeight,
+        });
+      },
+      false
+    );
     reader.readAsDataURL(file);
-  })
+  });
 }
 
-function createImage(url:string){
+function createImage(url: string) {
   return new Promise<HTMLImageElement>((resolve) => {
-    const img = new Image;
+    const img = new Image();
     img.onload = () => {
-      resolve(img)
-    }
-    img.src = url
-  })
+      resolve(img);
+    };
+    img.src = url;
+  });
 }
-function getImageDimensions(result:string){
+function getImageDimensions(result: string) {
   return new Promise<{
-    imageWidth: number,
-    imageHeight: number
+    imageWidth: number;
+    imageHeight: number;
   }>((resolve) => {
-    const img = new Image;
+    const img = new Image();
     img.onload = () => {
       resolve({
         imageWidth: img.width,
-        imageHeight: img.height
-      })
-    }
+        imageHeight: img.height,
+      });
+    };
     img.src = result;
-  })
+  });
 }
-
 
 function getIconColor(status: DropzoneStatus, theme: MantineTheme) {
   return status.accepted
@@ -168,18 +184,28 @@ const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) => (
   </Group>
 );
 
-function CropImage({imageSrc, setCroppedArea, sendingData}:{imageSrc:any, setCroppedArea:any, sendingData:boolean}){
-  const [crop, setCrop] = useState({x:0, y:0});
+function CropImage({
+  imageSrc,
+  setCroppedArea,
+  sendingData,
+}: {
+  imageSrc: any;
+  setCroppedArea: any;
+  sendingData: boolean;
+}) {
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
 
-  return(
-    <div style={{
-      position:'relative',
-      aspectRatio:'1/1',
-      width:'100%',
-    }}>
+  return (
+    <div
+      style={{
+        position: 'relative',
+        aspectRatio: '1/1',
+        width: '100%',
+      }}
+    >
       <Cropper
-        aspect={1/1}
+        aspect={1 / 1}
         image={imageSrc?.imageUrl}
         crop={crop}
         zoom={zoom}
@@ -187,8 +213,10 @@ function CropImage({imageSrc, setCroppedArea, sendingData}:{imageSrc:any, setCro
         onCropChange={sendingData ? () => {} : setCrop}
         onZoomChange={sendingData ? () => {} : setZoom}
         onCropComplete={(croppedArea, croppedAreaPixels) => setCroppedArea(croppedAreaPixels)}
-        objectFit={imageSrc?.imageWidth >= imageSrc?.imageHeight ? 'vertical-cover' : 'horizontal-cover'}
+        objectFit={
+          imageSrc?.imageWidth >= imageSrc?.imageHeight ? 'vertical-cover' : 'horizontal-cover'
+        }
       />
     </div>
-  )
+  );
 }

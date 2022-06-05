@@ -22,14 +22,23 @@ export const config = {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if(req.method === 'POST'){
-        const {base64} = req.body;
+        const {base64, componentId}: {base64: string, componentId: string} = req.body;
 
-        if(!base64){
+        if(!base64 || !componentId){
             res.status(400).json('invalid data'); 
             return;
         }
+
         const session = await getSession({req})
-        if(!session){
+        if(!session?.user.permissions.includes('materials')){
+            res.status(401).json('unauthorized');
+            return;
+        }
+
+        const {client, db} = await getDatabase()
+        const material = await db.collection('materials').findOne({_id: new ObjectId(componentId)})
+        if(material?.companyId.toString() !== session.user.companyId.toString()){
+            await client.close();
             res.status(401).json('unauthorized');
             return;
         }
@@ -42,18 +51,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         const params: PutObjectCommandInput = {
             Bucket: 'prodboost',
-            Key: `profile_images/${Date.now()}${getRandomInt(100,1000)}.webp`,
+            Key: `materials_images/${Date.now()}${getRandomInt(100,1000)}.webp`,
             ContentType: 'image/webp',
             Body: file
         }
         const urlToPicture = `https://prodboost.s3.eu-central-1.amazonaws.com/${params.Key}`;
         
-        const {client, db} = await getDatabase()
-        const user = await db.collection('users').findOne({_id: new ObjectId(session.user._id)})
-        if(user?.image_url){
+        
+        if(material?.image_url){
             await s3client.send(new DeleteObjectCommand({
                 Bucket: 'prodboost',
-                Key: `profile_images/${(user?.image_url as string).split('/').pop()}`
+                Key: `materials_images/${(material.image_url as string).split('/').pop()}`
             }))
         }
 
@@ -65,17 +73,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             s3client.destroy()
             await client.close();
             res.status(500).json('s3 bucket error');
+            return;
         }
         
-        const response = await db.collection('users').updateOne(
-            {...user},
+        const response = await db.collection('materials').updateOne(
+            {_id: new ObjectId(componentId)},
             {$set: {image_url: urlToPicture}}    
         )
 
         await client.close();
 
-        // response ? res.status(200).json('success') : res.status(400).json('error');
-        res.status(200).json('success')
+        res.status(200).json(urlToPicture)
     }
     else{
         res.status(500).json('Route not valid');

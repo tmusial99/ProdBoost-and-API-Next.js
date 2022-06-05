@@ -10,16 +10,17 @@ import useFormValidation from "../../lib/useFormValidation";
 import { AxiosError } from "axios";
 import axios from "../../lib/axios"
 import WithoutAuth from "../../components/hoc/WithoutAuth";
+import Head from "../../components/Head";
 
 export default function Register(){
     const [active, setActive] = useState(0);
-    const router = useRouter();
     const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
 
     const [allValues, setAllValues] = useSetState({})
 
     return (
         <WithoutAuth>
+            <Head title='ProdBoost - Rejestracja'/>
             <Navbar/>
             <Group px={20} grow={true} sx={{maxWidth:1000}} mx='auto'>
                 <Stepper active={active} onStepClick={setActive} breakpoint={470} pb={20} mt='lg'>
@@ -357,7 +358,7 @@ function CompanyDetails(props: { nextStep: () => void, setGlobalState: any, glob
                 props.nextStep(); 
                 
             }}>
-                <LoadingOverlay visible={sendingData}/>
+                <LoadingOverlay visible={sendingData} sx={{position: 'fixed'}}/>
                
                 <TextInput
                 mb={18}

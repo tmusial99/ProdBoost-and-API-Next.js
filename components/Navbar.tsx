@@ -8,6 +8,7 @@ import {  BuildingFactory2, Camera, Key, Logout, MoonStars, Settings, Tool, User
 export default function Navbar(){
   const {data: session} = useSession()
     return(
+      <nav>
         <Group position='center' sx={(theme) => ({
             backgroundColor:
                 theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]
@@ -20,8 +21,8 @@ export default function Navbar(){
             >
               {session && (
                 <>
-                <Group direction='column'>
-                  <Group spacing={5}>
+                <Group direction='column' noWrap>
+                  <Group spacing={5} noWrap>
                     <Avatar radius='xl' src={session.user.image_url}/>
                     <Text weight={500} size='lg'>{session.user?.name}</Text>
                     {session.user.role === 'CompanyOwner' && (
@@ -32,7 +33,7 @@ export default function Navbar(){
                     
                   <Link href='/dashboard'>
                       <Anchor href='/dashboard' variant='text'>
-                          <Group spacing={5} align='center'>           
+                          <Group spacing={5} align='center' noWrap>           
                               <Avatar radius='xl'><BuildingFactory2/></Avatar>
                               <Text weight={500} size='lg'>{session.user.companyName}</Text>
                           </Group>
@@ -45,7 +46,7 @@ export default function Navbar(){
                 {!session && (<ColorSchemeToggle/>)}
             </Group>
         </Group>
-        
+      </nav>
     )
 }
 

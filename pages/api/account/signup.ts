@@ -15,7 +15,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         const checkExisting = await db.collection('users').findOne({username: username});
         if(checkExisting){
-            client.close();
+            await client.close();
             res.status(400).json({message: 'Username taken'});
             return;
         }
@@ -31,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             permissions: ['materials', 'components', 'products', 'packing', 'orders'],
             companyId: addedCompany.insertedId
         });
-        client.close();
+        await client.close();
         res.status(201).json({message: 'User created'});
     }
     else{
