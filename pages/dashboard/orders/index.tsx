@@ -46,11 +46,10 @@ export default function Page({apiKey, userIsAdmin, allOrdersFromDb}: {apiKey: st
         { title: 'Zamówienia', href: '' }
     ]
     const openedModalForAPI = useState(false);
-    const setAllOrders = useSetAtom(allOrdersAtom);
+    const [allOrders, setAllOrders] = useAtom(allOrdersAtom);
     useEffect(() => {
         setAllOrders(allOrdersFromDb);
     },[])
-
 
     return(
         <>
@@ -85,6 +84,7 @@ const deliveryStatuses = [
 function Table(){
     const filteredAndSortedOrders = useAtomValue(filteredAndSortedOrdersAtom);
     const [ordersFilter, setOrdersFilter] = useAtom(selectedFilterForOrdersAtom)
+
     return(
         <>
             <Select data={deliveryStatuses} onChange={(value: '0' | '1' | '2' | '3' | '4' | '5' | '6') => setOrdersFilter(value)} value={ordersFilter} label='Filtruj wg. statusu' mt={20}/>
@@ -108,8 +108,8 @@ function Table(){
                                             <td>{order.orderId}</td>
                                             <td>{dayjs(order.createdAt).format('DD.M.YYYY | HH:mm') }</td>
                                             <td>{deliveryStatuses.filter(status => status.value === order.status.toString()).pop()?.label}</td>
-                                            <td>{`${order.totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł`}</td>
-                                            <td>{`${order.totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł`}</td>
+                                            <td>{order.totalNetto ? `${order.totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł`: '0,00 zł'}</td>
+                                            <td>{order.totalBrutto ? `${order.totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł`: '0,00zł'}</td>
                                     </tr>
                                 </Link> 
                             ))

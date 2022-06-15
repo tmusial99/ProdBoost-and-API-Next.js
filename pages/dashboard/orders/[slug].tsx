@@ -95,7 +95,7 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
         { title: `Zamówienie ${orderFromDb.orderId}`, href: `/dashboard/orders/${router.query.slug}`}
     ]
 
-    const setOrder = useSetAtom(orderAtom)
+    const [order, setOrder] = useAtom(orderAtom)
     const setDelivery = useSetAtom(deliveryAtom)
     const setProducts = useSetAtom(productsAtom)
     const productsInOrder = useAtomValue(productsInOrderAtom)
@@ -106,6 +106,10 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
         setDelivery(delivery)
         setProducts(products)
     }, [])
+    
+    useEffect(() => {
+        console.log(order)
+    })
 
     const isModalForDeletingOpened = useState(false)
     return(
@@ -133,8 +137,8 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
                                     <td>{product.productId}</td>
                                     <td>{product.name}</td>
                                     <td>{product.quantity}</td>
-                                    <td>{`${product.netto.toFixed(2).toString().replace(/[.]/g, ',')} zł`}</td>
-                                    <td>{`${product.brutto.toFixed(2).toString().replace(/[.]/g, ',')} zł`}</td>
+                                    <td>{product.netto ? `${product.netto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
+                                    <td>{product.brutto ? `${product.brutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
                                 </tr>
                             ))
                             }
@@ -142,15 +146,15 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
                                 <td>Dostawa</td>
                                 <td>{delivery.label}</td>
                                 <td>-</td>
-                                <td>{`${delivery.netto.toFixed(2)} zł`}</td>
-                                <td>{`${delivery.brutto.toFixed(2)} zł`}</td>
+                                <td>{delivery.netto ? `${delivery.netto.toFixed(2)} zł`: '0,00zł'}</td>
+                                <td>{delivery.brutto ? `${delivery.brutto.toFixed(2)} zł` : '0,00zł'}</td>
                             </tr>
                             <tr style={{fontWeight: 'bold'}}>
                                 <td></td>
                                 <td>Podsumowanie</td>
                                 <td></td>
-                                <td>{`${totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł`}</td>
-                                <td>{`${totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł`}</td>
+                                <td>{totalNetto ? `${totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
+                                <td>{totalBrutto ? `${totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
                             </tr>
                         </tbody>
                     </Table>
