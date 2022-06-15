@@ -6,8 +6,8 @@ import { IMaterial } from "../../../types/items";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if(req.method === 'POST'){
-        const {data, componentId}: {data: IMaterial, componentId: string} = req.body;
-        if(!data || !data.name || data.quantity as number < 0 || !componentId){
+        const {data, materialId}: {data: IMaterial, materialId: string} = req.body;
+        if(!data || !data.name || data.quantity as number < 0 || !materialId){
             res.status(400).json('invalid data'); 
             return;
         }
@@ -32,7 +32,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const onlyTrue = asArray.filter(([key, value]) => value || value === 0)
         const onlyFalse = asArray.filter(([key, value]) => value === '')
         try{
-            await db.collection('materials').updateOne({_id: new ObjectId(componentId)}, {
+            await db.collection('materials').updateOne({_id: new ObjectId(materialId)}, {
                 $unset: Object.fromEntries(onlyFalse),
                 $set: Object.fromEntries(onlyTrue)
             })

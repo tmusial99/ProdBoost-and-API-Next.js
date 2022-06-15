@@ -4,6 +4,7 @@
     padding-bottom: 100px;
 }
 
+
 .stepperContentRegister{
     display: flex;
     flex-grow: 1;
@@ -11,4 +12,47 @@
 
 .tableLink:hover{
     cursor: pointer;
+}
+
+.ellipsisText{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.componentTabs{
+    flex-basis: 25%;
+}
+@media (max-width: 638px){
+    .componentTabs{
+        flex-basis: 50%
+    }
+}
+@media (max-width: 343px){
+    .componentTabs{
+        flex-basis: 100%
+    }
+}
+
+@media (max-width: 624px){
+    .deliveryOption{
+        flex-basis: 50%;
+        max-width: 50%;
+    }
+}
+
+@media print{
+    .hideOnPrint{
+        display: none;
+    }
+    .textBlackOnPrint{
+        color: black;
+    }
+    .marginOnPrint{
+        margin: 0px;
+        padding: 0px;
+    }
+    #__next{
+        background-color: white;
+    }
 }

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 
 export default function Footer(){
     return(
-        <footer style={{
+        <footer className='hideOnPrint' style={{
             position: 'absolute',
             bottom: 0,
             width: '100%',

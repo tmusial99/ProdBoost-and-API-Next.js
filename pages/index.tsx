@@ -6,9 +6,9 @@ export default function HomePage() {
   return (
     <>
       <Head title='ProdBoost'/>
-      <Center style={{marginTop:'20px'}}>
+      <Center>
         <Link href='dashboard'>
-          <Button component='a' href='dashboard'>Panel klienta</Button>
+          <Button mt={20} component='a' href='dashboard'>Panel klienta</Button>
         </Link>
       </Center>
     </>

@@ -94,11 +94,11 @@ export default function Page({JsonMaterials}: {JsonMaterials: string}){
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th><TableHeaderButton label="ID" propertyName="materialId" sorting={sorting} setSorting={setSorting}/></th>
-                                    <th><TableHeaderButton label="Nazwa" propertyName="name" sorting={sorting} setSorting={setSorting}/></th>
-                                    <th><TableHeaderButton label="Ilość" propertyName="quantity" sorting={sorting} setSorting={setSorting}/></th>
-                                    <th><TableHeaderButton label="Netto" propertyName="netto" sorting={sorting} setSorting={setSorting}/></th>
-                                    <th><TableHeaderButton label="Brutto" propertyName="brutto" sorting={sorting} setSorting={setSorting}/></th>
+                                    <th><TableHeaderButtonMaterials label="ID" propertyName="materialId" sorting={sorting} setSorting={setSorting}/></th>
+                                    <th><TableHeaderButtonMaterials label="Nazwa" propertyName="name" sorting={sorting} setSorting={setSorting}/></th>
+                                    <th><TableHeaderButtonMaterials label="Ilość" propertyName="quantity" sorting={sorting} setSorting={setSorting}/></th>
+                                    <th><TableHeaderButtonMaterials label="Netto" propertyName="netto" sorting={sorting} setSorting={setSorting}/></th>
+                                    <th><TableHeaderButtonMaterials label="Brutto" propertyName="brutto" sorting={sorting} setSorting={setSorting}/></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -112,8 +112,8 @@ export default function Page({JsonMaterials}: {JsonMaterials: string}){
                                                     <td>{material.materialId}</td>
                                                     <td>{material.name}</td>
                                                     <td>{material.quantity}</td>
-                                                    <td>{material.netto ? `${material.netto} zł` : null}</td>
-                                                    <td>{material.brutto ? `${material.brutto} zł` : null}</td>
+                                                    <td>{material.netto ? `${material.netto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : null}</td>
+                                                    <td>{material.brutto ? `${material.brutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : null}</td>
                                             </tr>
                                         </Link> 
                                     ))
@@ -129,7 +129,7 @@ export default function Page({JsonMaterials}: {JsonMaterials: string}){
 }
 
 type IPropertyName = 'materialId' | 'name' | 'quantity' | 'netto' | 'brutto'
-function TableHeaderButton({label, propertyName, sorting, setSorting}: {label: string, propertyName: IPropertyName, sorting: ISorting, setSorting: Dispatch<SetStateAction<ISorting>>}){
+function TableHeaderButtonMaterials({label, propertyName, sorting, setSorting}: {label: string, propertyName: IPropertyName, sorting: ISorting, setSorting: Dispatch<SetStateAction<ISorting>>}){
     return(
         <UnstyledButton p={10} sx={{fontWeight: 700, width: '100%', height: '100%'}} onClick={() => setSorting((curr) => curr[0] === propertyName && curr[1] === 'asc' ? [propertyName, 'desc'] : [propertyName, 'asc'])}>
             <Group spacing={5}>

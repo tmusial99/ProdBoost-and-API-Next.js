@@ -8,7 +8,7 @@ import {  BuildingFactory2, Camera, Key, Logout, MoonStars, Settings, Tool, User
 export default function Navbar(){
   const {data: session} = useSession()
     return(
-      <nav>
+      <nav className='hideOnPrint'>
         <Group position='center' sx={(theme) => ({
             backgroundColor:
                 theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]

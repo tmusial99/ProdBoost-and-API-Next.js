@@ -29,7 +29,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 ...data,
                 materialId: newMaterialId,
                 companyId: new ObjectId(session.user.companyId),
-                createdById: new ObjectId(session.user._id),
+                createdBy: `${session.user.name}`,
                 createdAt: Date.now()
             })  
         }

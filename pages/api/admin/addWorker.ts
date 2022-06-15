@@ -56,8 +56,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 function generateRandomUserData(firstName:string, surname:string){
-    const firstPart = firstName.substring(0, 3).toLowerCase();
-    const secondPart = surname.substring(0, 3).toLowerCase();
+    const firstPart = deletePolishLetters(firstName.substring(0, 3).toLowerCase());
+    const secondPart = deletePolishLetters(surname.substring(0, 3).toLowerCase());
     const thirdPart = getRandomInt(100, 1000);
 
     return firstPart + secondPart + thirdPart;
@@ -67,4 +67,18 @@ function getRandomInt(min:number, max:number) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
-  }
+}
+
+function deletePolishLetters(value: string){
+    let copyOfValue = value;
+    copyOfValue = copyOfValue.replace("ó","o");
+    copyOfValue = copyOfValue.replace("ł","l");
+    copyOfValue = copyOfValue.replace("ń","n");
+    copyOfValue = copyOfValue.replace("ż","z");
+    copyOfValue = copyOfValue.replace("ź","z");
+    copyOfValue = copyOfValue.replace("ć","c");
+    copyOfValue = copyOfValue.replace("ę","e");
+    copyOfValue = copyOfValue.replace("ś","s");
+
+    return copyOfValue;
+}

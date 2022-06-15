@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from 'next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import { getCookie, setCookies } from 'cookies-next';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
@@ -9,6 +9,7 @@ import { SessionProvider } from 'next-auth/react';
 import { Router } from 'next/router';
 import ProgressBar from "@badrap/bar-of-progress";
 import Footer from '../components/Footer';
+import { useColorScheme } from '@mantine/hooks';
 
 const progress = new ProgressBar({
   size: 3,
@@ -22,8 +23,12 @@ Router.events.on('routeChangeError', () => progress.finish());
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
+  const preferredColorScheme = useColorScheme();
   const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
-  
+
+  useEffect(() => {
+    if(props.colorScheme === undefined) setColorScheme(preferredColorScheme)
+  }, [preferredColorScheme])
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme = value || (colorScheme === 'dark' ? 'light' : 'dark');
@@ -37,7 +42,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
           <NotificationsProvider>
             <SessionProvider session={pageProps?.session}>
-              <Component {...pageProps} />
+              <Component {...pageProps}/>
               <Footer/>
             </SessionProvider>
           </NotificationsProvider>
@@ -48,5 +53,5 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 }
 
 App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
-  colorScheme: getCookie('mantine-color-scheme', ctx) || 'light',
+  colorScheme: getCookie('mantine-color-scheme', ctx),
 });

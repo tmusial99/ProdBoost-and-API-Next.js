@@ -1,19 +1,22 @@
-import { Avatar, Badge, Box, Button, Center, Container, Group, LoadingOverlay, Modal, NumberInput, Paper, Popover, Tabs, Text, TextInput, Title, Tooltip } from "@mantine/core"
+import { Avatar, Badge, Button, Container, Group, Image, LoadingOverlay, Modal, NumberInput, Paper, ScrollArea, Table, Tabs, Text, TextInput, Title, Tooltip } from "@mantine/core"
 import { useSetState } from "@mantine/hooks"
 import { showNotification } from "@mantine/notifications"
 import { CheckIcon } from "@modulz/radix-icons"
 import { AxiosError } from "axios"
-import dayjs from "dayjs"
 import { ObjectId, WithId } from "mongodb"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/react"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { Dispatch, useEffect, useState } from "react"
-import { CalendarTime, Camera, CirclePlus, ClipboardList, InfoCircle, Trash, Upload, X } from "tabler-icons-react"
+import { Calculator, Camera, CirclePlus, ClipboardList, InfoCircle, Qrcode, Trash, Upload, X } from "tabler-icons-react"
 import DropzoneForImages from "../../../components/DropzoneForImages"
+import EditQuantityModal from "../../../components/EditQuantityModal"
 import Head from "../../../components/Head"
 import Navbar from "../../../components/Navbar"
 import Navigation from "../../../components/Navigation"
+import PopoverForUserInfo from "../../../components/PopoverForUserInfo"
+import QRcode from "../../../components/QRcode"
 import axios from "../../../lib/axios"
 import getDatabase from "../../../lib/getDatabase"
 import { IMaterial } from "../../../types/items"
@@ -34,21 +37,20 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     if(!response) return {
         notFound: true
     }
-    const creator = await db.collection('users').find({_id: response.createdById}).project({_id: 0, firstName: 1, surname: 1}).toArray();
+    const inComponents = await db.collection('components').find({companyId: new ObjectId(session.user.companyId), usedMaterials: response._id.toString()}).project({_id: 0, image_url: 1, componentId: 1, name: 1}).toArray();
     
-
     const JsonMaterial = JSON.stringify(response)
-    const JsonCreator = JSON.stringify(creator[0])
+    const JsonInComponents = JSON.stringify(inComponents)
     await client.close();
 
-    return {props: {JsonMaterial, JsonCreator}}
+    return {props: {JsonMaterial, JsonInComponents}}
 }
 
 
-export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string, JsonCreator: string}){
+export default function Page({JsonMaterial, JsonInComponents}: {JsonMaterial: string, JsonInComponents: string}){
     const router = useRouter();
     const [material, setMaterial] = useState<WithId<IMaterial>>(JSON.parse(JsonMaterial));
-    const [creator, setCreator] = useState<{firstName: string, surname: string}>(JSON.parse(JsonCreator))
+    const [inComponents, setInComponents] = useState<{image_url?: string, componentId: number, name: string}[]>(JSON.parse(JsonInComponents));
     const items = [
         { title: 'Dashboard', href: '/dashboard' },
         { title: 'Materiały', href: '/dashboard/materials' },
@@ -72,7 +74,6 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
 
     const [activeTab, setActiveTab] = useState(0);
 
-
     const [form, setForm] = useSetState<IMaterial>({
         name: material.name,
         quantity: material.quantity,
@@ -91,17 +92,16 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
         setTag('');
     }
 
-    //#region NAME VALIDATION
-
+    const modalForEditQuantity = useState(false);
     const [modalForDeleting, setModalForDeleting] = useState(false);
 
     const [sendingData, setSendingData] = useState(false);
     const sendData = async () => {
         setSendingData(true);
         try{
-            const res = await axios.post('/api/materials/edit', {data: form, componentId: material._id})
+            const res = await axios.post('/api/materials/edit', {data: form, materialId: material._id})
             setSendingData(false);
-            setMaterial((curr) => ({...curr, name: form.name}));
+            setMaterial((curr) => ({...curr, name: form.name, quantity: form.quantity}));
             showNotification({
                 title: 'Udało się!',
                 message: 'Poprawnie zapisano zmiany materiału.',
@@ -117,6 +117,8 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
             setSendingData(false);
         }
     }
+
+    //#region NAME VALIDATION
     const [error, setError] = useState('');
     useEffect(() => {
         if(form.name.length < 3 && form.name.length > 0) setError('Nazwa musi mieć minimalnie 3 znaki.');
@@ -125,6 +127,9 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
     }, [form.name])
     //#endregion
 
+    const [qrCode, setQrCode] = useState(false);
+    if(qrCode) return <QRcode setQrCode={setQrCode} id={material.materialId as number} name={material.name} label='Materiał'/>
+    
     return(
         <>
             <Head title={`ProdBoost - ${material.name}`}/>
@@ -132,6 +137,7 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
             <Container>
                 <LoadingOverlay visible={sendingData} sx={{position: 'fixed'}}/>
                 <ModalForDeleting modalForDeleting={modalForDeleting} setModalForDeleting={setModalForDeleting} material={material}/>
+                <EditQuantityModal variant='materials' openModalState={modalForEditQuantity} component={material} setComponent={setMaterial} setForm={setForm}/>
                 <Navigation items={items}/>
                     <Tabs position='center' grow active={activeTab} onTabChange={setActiveTab}>
                         <Tabs.Tab label='Materiał' icon={<ClipboardList size={20}/>}>
@@ -142,7 +148,7 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
                                         <Avatar src={material.image_url} radius={100} size={200}/>
                                         <Group spacing={5}>
                                             <Text size='lg' weight='bold'>{material.name}</Text>
-                                            <PopoverForUserInfo creator={creator} createdAt={material.createdAt as number}/>
+                                            <PopoverForUserInfo creator={material.createdBy as string} createdAt={material.createdAt as number}/>
                                         </Group>
                                         <Button leftIcon={<Trash/>} radius='xl' size='md' variant='outline' disabled={!material.image_url} loading={deletingPhoto} onClick={() => deletePhoto()}>Usuń obecne zdjęcie</Button>
                                     </Group>
@@ -150,14 +156,19 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
                             <Group position='center' direction='column' grow mx='auto' mt={20} sx={{maxWidth: '400px'}}>
                                 <TextInput label='Nazwa materiału' required  value={form.name} onChange={(e) => setForm({name: e.target.value})} error={error}/>
                                 
-                                <NumberInput
-                                    required
-                                    label='Ilość'
-                                    value={form.quantity}
-                                    onChange={(value) => setForm({quantity: value})}
-                                    min={0}
-                                    max={99_999_999}
-                                />
+                                <Group grow noWrap align='flex-end'>
+                                    <NumberInput
+                                        required
+                                        label='Ilość'
+                                        value={form.quantity}
+                                        onChange={(value) => setForm({quantity: value})}
+                                        min={0}
+                                        max={99_999_999}
+                                        sx={{maxWidth: '100%'}}
+                                    />
+                                    <Button sx={{maxWidth: '50px'}} px={0} radius='xl' variant='outline' onClick={() => modalForEditQuantity[1](true)}><Calculator/></Button>
+                                </Group>
+                                
                                 <Tooltip
                                     withArrow
                                     radius='md'
@@ -250,6 +261,7 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
                                 <Group position='center' mt={20} mx='auto' sx={{maxWidth: 400}}>
                                     <Button sx={{flexGrow: 1}} leftIcon={<Upload size={18}/>} disabled={!!error.length || !form.name.length || form.quantity === undefined || isNaN(form.quantity)} loading={sendingData} onClick={() => sendData()}>Zapisz zmiany</Button>
                                     <Button sx={{flexGrow: 1}} variant='outline' color='red' leftIcon={<Trash size={18}/>} onClick={() => setModalForDeleting(true)}>Usuń materiał</Button>
+                                    <Button sx={{flexGrow: 1}} color='yellow' leftIcon={<Qrcode size={18}/>} onClick={() => setQrCode(true)}>Generuj kod QR</Button>
                                 </Group>
                             </Group>
                         </Tabs.Tab>
@@ -261,39 +273,41 @@ export default function Page({JsonMaterial, JsonCreator}: {JsonMaterial: string,
                                 }}/>
                             </Group>
                         </Tabs.Tab>
+                        <Tabs.Tab label='Informacje' icon={<InfoCircle size={20}/>}>
+                            <Title order={2} mt={20}>Użyto w komponentach</Title>
+                            {inComponents.length === 0 && (<Text align='center' mt={20}>Nie znaleziono komponentów.</Text>)}
+                            {inComponents.length > 0 && (
+                                <ScrollArea type='always' mt={10}>
+                                    <Table highlightOnHover fontSize='lg' sx={{minWidth: '720px'}}>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>ID</th>
+                                                <th>Nazwa</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                inComponents.map((component) => (
+                                                    <Link href={`/dashboard/components/${component.componentId}`} key={component.componentId}>
+                                                        <tr key={component.componentId} className='tableLink'>
+                                                                <td style={{width: '100px'}}>
+                                                                    <Image src={component.image_url} withPlaceholder={!component.image_url} height={100} width={100}/>
+                                                                </td>
+                                                                <td>{component.componentId}</td>
+                                                                <td>{component.name}</td>
+                                                        </tr>
+                                                    </Link> 
+                                                ))
+                                            }
+                                        </tbody>
+                                    </Table>
+                                </ScrollArea>
+                            )}
+                        </Tabs.Tab>
                     </Tabs>
-                
             </Container>
         </>
-    )
-}
-
-function PopoverForUserInfo({creator, createdAt}: {creator: {firstName: string, surname: string}, createdAt: number}){
-    const [opened, setOpened] = useState(false);
-    return(
-        <Popover
-            opened={opened}
-            onClose={() => setOpened(false)}
-            position='bottom'
-            placement='center'
-            withArrow
-            trapFocus={false}
-            closeOnEscape={false}
-            transition="pop-top-left"
-            styles={{ body: { pointerEvents: 'none' } }}
-            target={
-              <Group onMouseEnter={() => setOpened(true)} onMouseLeave={() => setOpened(false)}>
-                <InfoCircle/>
-              </Group>
-            }
-        >
-            <Text weight='bold'>Utworzone przez:</Text>
-            <Text>{`${creator.firstName} ${creator.surname}`}</Text>
-            <Group position='left' spacing={10} mt={15}>
-                <CalendarTime size={15}/>
-                <Text color='dimmed'>{dayjs(createdAt).format('DD.M.YYYY | HH:mm')}</Text>
-            </Group>
-        </Popover>
     )
 }
 

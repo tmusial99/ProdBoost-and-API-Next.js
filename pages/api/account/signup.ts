@@ -20,7 +20,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             return;
         }
         const addedCompany = await db.collection('companies').insertOne({
-            companyName: companyName
+            companyName: companyName,
+            deliveryOptions: [
+                {
+                    id: 1,
+                    label: 'Odbiór osobisty',
+                    netto: 0,
+                    brutto: 0
+                }
+            ]
         })
         const status = await db.collection('users').insertOne({
             username: username,

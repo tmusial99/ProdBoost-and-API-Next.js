@@ -50,7 +50,10 @@ export default function DropzoneForImages({ apiRoute, componentId, callback}: { 
                 ); 
                 const jsonBody = componentId ? {base64: base64cropped, componentId: componentId} : {base64: base64cropped}
                 const { data } = await axios.post(apiRoute, jsonBody);
-                if(callback) callback(data)
+                if(callback){
+                  callback(data);
+                  return;
+                } 
                 if (apiRoute === '/api/account/changePicture') {
                   await updateSession();
                 }
@@ -201,7 +204,7 @@ function CropImage({
       style={{
         position: 'relative',
         aspectRatio: '1/1',
-        width: '100%',
+        width: '100%'
       }}
     >
       <Cropper

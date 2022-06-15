@@ -40,28 +40,28 @@ export default function Dashboard(){
                     <Group position="center">
                         {session.user.permissions.includes('materials') && (
                             <Link href='/dashboard/materials' passHref>
-                                <Button component='a' size='xl' radius='xl' color='teal' leftIcon={<Leaf/>}>Materiały</Button>
+                                <Button component='a' size='xl' radius='xl' color='teal' leftIcon={<Leaf/>} sx={{'@media (max-width: 450px)': {minWidth: '100%'}}}>Materiały</Button>
                             </Link>
                             
                         )}
                         {session.user.permissions.includes('components') && (
                             <Link href='/dashboard/components' passHref>
-                                <Button component='a' size='xl' radius='xl' color='green' leftIcon={<Seeding/>}>Komponenty</Button>
+                                <Button component='a' size='xl' radius='xl' color='green' leftIcon={<Seeding/>} sx={{'@media (max-width: 450px)': {minWidth: '100%'}}}>Komponenty</Button>
                             </Link>
                         )}
                         {session.user.permissions.includes('products') && (
                             <Link href='/dashboard/products' passHref>
-                                <Button component='a' size='xl' radius='xl' color='lime' leftIcon={<Plant/>}>Produkty</Button>
+                                <Button component='a' size='xl' radius='xl' color='lime' leftIcon={<Plant/>} sx={{'@media (max-width: 450px)': {minWidth: '100%'}}}>Produkty</Button>
                             </Link>
                         )}
                         {session.user.permissions.includes('packing') && (
                             <Link href='/dashboard/packing' passHref>
-                                <Button component='a' size='xl' radius='xl' color='blue' leftIcon={<Package/>}>Pakowanie</Button>
+                                <Button component='a' size='xl' radius='xl' color='blue' leftIcon={<Package/>} sx={{'@media (max-width: 450px)': {minWidth: '100%'}}}>Pakowanie</Button>
                             </Link>
                         )}
                         {session.user.permissions.includes('orders') && (
                             <Link href='/dashboard/orders' passHref>
-                                <Button component='a' size='xl' radius='xl' color='violet' leftIcon={<ClipboardList/>}>Zamówienia</Button>
+                                <Button component='a' size='xl' radius='xl' color='violet' leftIcon={<ClipboardList/>} sx={{'@media (max-width: 450px)': {minWidth: '100%'}}}>Zamówienia</Button>
                             </Link>
                         )}
                     </Group>  
@@ -112,15 +112,15 @@ function Login(){
                 showError: true,
                 msgError: 'Niepoprawna nazwa użytkownika lub hasło. Spróbuj jeszcze raz.'
             })
+            setLoading(false);
         }
         if(res.error === 'Network Error'){
             setError({
                 showError: true,
                 msgError: 'Serwer nie odpowiada. Spróbuj ponownie później.'
             })
+            setLoading(false);
         }
-        
-        setLoading(false);
     }
     
     return(
