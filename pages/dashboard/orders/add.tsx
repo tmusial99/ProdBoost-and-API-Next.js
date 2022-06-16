@@ -360,7 +360,7 @@ export default function Page({allProducts, deliveryOptions, isAdmin}: {allProduc
                             <Select label='Dodaj metodę dostawy' data={Object.values(deliveryState[0]).map(x => ({label: `${x.label} - ${x.brutto.toFixed(2)} zł`, value: `${x.id}`}))} value={selectedDelivery} onChange={(value) => setSelectedDelivery(value as string)}/>
                             {isAdmin && (<Button onClick={() => modalForEditingDeliveryOpened[1](true)}>Edytuj</Button>)}
                         </Group>
-                        <Form selectedDelivery={parseInt(selectedDelivery)} basket={basket} quantityOfItemsInBasket={quantityOfItemsInBasket} form={form}/>
+                        <Form selectedDelivery={parseInt(selectedDelivery)} deliveryState={deliveryState[0]} basket={basket} quantityOfItemsInBasket={quantityOfItemsInBasket} form={form}/>
                     </>
                 )}
             </Container>
@@ -381,9 +381,13 @@ export function TableHeaderButtonMaterials({label, propertyName, sorting, setSor
     )
 }
 
-function Form({selectedDelivery, basket, quantityOfItemsInBasket, form}: {form: any, selectedDelivery: number, basket: IProduct[], quantityOfItemsInBasket: {[productId: number]: number | null}}){
+function Form({deliveryState, selectedDelivery, basket, quantityOfItemsInBasket, form}: {deliveryState: {id: number, label: string, netto: number, brutto: number}[],form: any, selectedDelivery: number, basket: IProduct[], quantityOfItemsInBasket: {[productId: number]: number | null}}){
     const router = useRouter();
     const [sendingData, setSendingData] = useState(false);
+
+    useEffect(() => {
+        console.log(deliveryState)
+    }, [deliveryState])
 
     const sendData = async () => {
         const {hasErrors} = form.validate()
@@ -391,9 +395,20 @@ function Form({selectedDelivery, basket, quantityOfItemsInBasket, form}: {form: 
 
         setSendingData(true);
         try{
+            const delivery = deliveryState.find(delivery => delivery.id === selectedDelivery);
             const res = await axios.post('/api/orders/add', {
-                basket: basket.map(x => [x.productId, quantityOfItemsInBasket?.[x.productId]]),
-                deliveryId: selectedDelivery,
+                basket: basket.map(x => ({
+                    productId: x.productId,
+                    name: x.name,
+                    quantity: quantityOfItemsInBasket?.[x.productId],
+                    totalNetto: x.netto ? quantityOfItemsInBasket?.[x.productId] as number * x.netto : 0,
+                    totalBrutto: x.brutto ? quantityOfItemsInBasket?.[x.productId] as number * x.brutto : 0
+                })),
+                delivery: {
+                    label: delivery?.label,
+                    netto: delivery?.netto,
+                    brutto: delivery?.brutto
+                },
                 form: form.values
             })
             router.replace(`/dashboard/orders/${res.data.orderId}`)

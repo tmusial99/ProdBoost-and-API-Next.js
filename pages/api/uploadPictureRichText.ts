@@ -38,9 +38,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .webp()
         .toBuffer()
 
-        unlink(image.path, (err) => {
-            if(err) return res.status(500).json(err)
-        })
+        try{
+            unlink(image.path, (err) => {
+                if(err) throw new Error()
+            })
+        }
+        catch(err){
+            return res.status(500).json('unlink image error')
+        }
 
         const params: PutObjectCommandInput = {
             Bucket: 'prodboost',

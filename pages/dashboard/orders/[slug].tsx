@@ -18,44 +18,6 @@ import getDatabase from "../../../lib/getDatabase";
 
 //#region atoms
 const orderAtom = atom<IOrder & {_id: string} | null>(null)
-const productsAtom = atom<{productId: number, name: string, netto: number, brutto: number}[]>([])
-const deliveryAtom = atom<{id: number, label: string, netto: number, brutto: number} | null>(null)
-const productsInOrderAtom = atom(
-    (get) => {
-        const order = get(orderAtom);
-        const products = get(productsAtom);
-        const basket = order?.basket;
-
-        const productsArr = basket?.map((value: [number, number]) => {
-            const product = products.find(product => product.productId === value[0])
-            return {productId: product?.productId, name: product?.name, quantity: value[1], netto: product?.netto as number * value[1], brutto: product?.brutto as number * value[1]}
-        })
-
-        return productsArr
-    }
-)
-const totalNettoAtom = atom(
-    (get) => {
-        const productsArr = get(productsInOrderAtom);
-        const delivery = get(deliveryAtom);
-        let totalNetto = 0;
-        productsArr?.forEach(product => totalNetto += product.netto);
-        totalNetto += delivery?.netto as number;
-
-        return totalNetto;
-    }
-)
-const totalBruttoAtom = atom(
-    (get) => {
-        const productsArr = get(productsInOrderAtom);
-        const delivery = get(deliveryAtom);
-        let totalBrutto = 0;
-        productsArr?.forEach(product => totalBrutto += product.brutto);
-        totalBrutto += delivery?.brutto as number;
-
-        return totalBrutto;
-    }
-)
 //#endregion atoms
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -76,18 +38,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         return { notFound: true }
     }
 
-    const deliveries = await db.collection('companies').findOne({_id: new ObjectId(session.user.companyId)}, {projection: {_id: 0, deliveryOptions: 1}});
-    const delivery = deliveries?.deliveryOptions.find((x: any) => x.id === order?.deliveryId)
-
-    const productIdArr = order.basket.map((arr: [number, number]) => arr[0]);
-    const products = await db.collection('products').find({companyId: new ObjectId(session.user.companyId), productId: {$in: productIdArr}}, {projection: {_id: 0, productId: 1, name: 1, netto: 1, brutto: 1}}).toArray()
-
     await client.close();
 
-    return {props: {orderFromDb: JSON.parse(JSON.stringify(order)), delivery: delivery, products: products}}
+    return {props: {orderFromDb: JSON.parse(JSON.stringify(order))}}
 }
 
-export default function Page({orderFromDb, delivery, products}: {orderFromDb: IOrder & {_id: string}, delivery: {id: number, label: string, netto: number, brutto: number}, products: {productId: number, name: string, netto: number, brutto: number}[]}){
+export default function Page({orderFromDb}: {orderFromDb: IOrder & {_id: string}}){
     const router = useRouter()
     const items = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -95,16 +51,10 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
         { title: `Zamówienie ${orderFromDb.orderId}`, href: `/dashboard/orders/${router.query.slug}`}
     ]
 
-    const setOrder = useSetAtom(orderAtom)
-    const setDelivery = useSetAtom(deliveryAtom)
-    const setProducts = useSetAtom(productsAtom)
-    const productsInOrder = useAtomValue(productsInOrderAtom)
-    const totalNetto = useAtomValue(totalNettoAtom)
-    const totalBrutto = useAtomValue(totalBruttoAtom)
+    const [order, setOrder] = useAtom(orderAtom)
+
     useEffect(() => {
         setOrder(orderFromDb)
-        setDelivery(delivery)
-        setProducts(products)
     }, [])
 
     const isModalForDeletingOpened = useState(false)
@@ -128,29 +78,29 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
                         </thead>
                         <tbody>
                             {
-                            productsInOrder && productsInOrder.map((product) => (
+                            order && order.basket?.map((product) => (
                                 <tr key={product.productId}>
                                     <td>{product.productId}</td>
                                     <td>{product.name}</td>
                                     <td>{product.quantity}</td>
-                                    <td>{product.netto ? `${product.netto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
-                                    <td>{product.brutto ? `${product.brutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
+                                    <td>{product.totalNetto ? `${product.totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
+                                    <td>{product.totalBrutto ? `${product.totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
                                 </tr>
                             ))
                             }
                             <tr>
                                 <td>Dostawa</td>
-                                <td>{delivery.label}</td>
+                                <td>{order?.delivery.label}</td>
                                 <td>-</td>
-                                <td>{delivery.netto ? `${delivery.netto.toFixed(2)} zł`: '0,00zł'}</td>
-                                <td>{delivery.brutto ? `${delivery.brutto.toFixed(2)} zł` : '0,00zł'}</td>
+                                <td>{order?.delivery.netto ? `${order.delivery.netto.toFixed(2)} zł`: '0,00zł'}</td>
+                                <td>{order?.delivery.brutto ? `${order.delivery.brutto.toFixed(2)} zł` : '0,00zł'}</td>
                             </tr>
                             <tr style={{fontWeight: 'bold'}}>
                                 <td></td>
                                 <td>Podsumowanie</td>
                                 <td></td>
-                                <td>{totalNetto ? `${totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
-                                <td>{totalBrutto ? `${totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
+                                <td>{order?.totalNetto ? `${order.totalNetto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
+                                <td>{order?.totalBrutto ? `${order.totalBrutto.toFixed(2).toString().replace(/[.]/g, ',')} zł` : '0,00zł'}</td>
                             </tr>
                         </tbody>
                     </Table>
@@ -158,7 +108,6 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
                 <Form/>
                 <Group sx={{maxWidth: '600px'}} mx='auto' position='center' grow>
                     <Button color='red' leftIcon={<Trash size={20}/>} onClick={() => isModalForDeletingOpened[1](true)}>Usuń zamówienie</Button>
-
                 </Group>
             </Container>
         </>

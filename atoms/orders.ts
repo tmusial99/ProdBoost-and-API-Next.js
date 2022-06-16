@@ -1,27 +1,14 @@
 import { sort } from "fast-sort";
 import { atom } from "jotai";
+import { InferType } from "yup";
+import { orderApiSchema } from "../schemas/order";
 
-export type IOrder = {
+export type IOrder = InferType<typeof orderApiSchema> & {
     orderId: number,
-    deliveryId: number,
+    status: number,
     createdAt: number,
     totalNetto: number,
     totalBrutto: number
-    status: number,
-    basket: Array<[productId: number, quantity: number]>,
-    form: {
-        firstName: string,
-        surname: string,
-        address: string,
-        postalCode: string,
-        city: string,
-        country: string,
-        prefix: string,
-        phoneNumber: string,
-        email: string | null,
-        companyName: string | null,
-        nip: string | null
-    }
 }
 
 export type ISortingOrdersPropertyNames = 'orderId' | 'createdAt' | 'totalNetto' | 'totalBrutto'

@@ -1,4 +1,4 @@
-import { array, number, object, string, TypeOf } from 'yup';
+import { array, InferType, number, object, string, TypeOf } from 'yup';
 
 export const orderFormSchema = object({
     firstName: string().required().min(2, 'Imię musi mieć minimalnie 2 znaki.').max(25, 'Imię musi mieć maksymalnie 25 znaków.'),
@@ -15,8 +15,18 @@ export const orderFormSchema = object({
 });
 
 export const orderApiSchema = object({
-    basket: array().required().of(array().length(2).of(number().positive())),
-    deliveryId: number().required().integer().min(1),
+    basket: array().required().of(object({
+        productId: number().required().integer().min(1).max(999999),
+        name: string().required().min(3).max(25),
+        quantity: number().required().integer().min(1).max(999999),
+        totalNetto: number().required().min(0).max(999999999),
+        totalBrutto: number().required().min(0).max(999999999)
+    }).required()),
+    delivery: object({
+        label: string().required(),
+        netto: number().required().min(0).max(9999),
+        brutto: number().required().min(0).max(9999)
+    }).required(),
     form: object({
         firstName: string().required().min(2).max(25),
         surname: string().required().min(2).max(25),
@@ -31,5 +41,3 @@ export const orderApiSchema = object({
         nip: string().nullable().optional().transform(value => !!value ? value.replace(/\s*/g, '') : null).matches(/^\d*$/, 'Invalid NIP number.').length(10)
     }).required()
 })
-
-export type IOrderApiSchema = TypeOf<typeof orderApiSchema>;
