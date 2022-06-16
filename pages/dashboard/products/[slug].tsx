@@ -456,20 +456,11 @@ function RichTextComponent({richTextState, setLoadingOverlay, productId}: {richT
     }
 
     const handleImageUpload = (file: File): Promise<string> => new Promise(async (resolve, reject) => {
-        const fileArrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = (event) => {
-                resolve(event.target?.result as ArrayBuffer);
-            }
-            reader.onerror = (error) => {
-                reject(error);
-            }
-            reader.readAsArrayBuffer(file)
-        })
-        const fileUint8Array = new Uint8Array(fileArrayBuffer) 
+        const formData = new FormData()
+        formData.append('image', file);
 
-        axios.post('/api/uploadPictureRichText', {image: Array.from(fileUint8Array)})
-        .then((res) => resolve(res.data as string))
+        axios.post('/api/uploadPictureRichText', formData)
+            .then(res => resolve(res.data as string))
             .catch(() => reject(new Error('Błąd - nie udało się dodać obrazu')))
     });
  

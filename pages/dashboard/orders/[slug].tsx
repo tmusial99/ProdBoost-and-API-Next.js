@@ -95,7 +95,7 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
         { title: `Zamówienie ${orderFromDb.orderId}`, href: `/dashboard/orders/${router.query.slug}`}
     ]
 
-    const [order, setOrder] = useAtom(orderAtom)
+    const setOrder = useSetAtom(orderAtom)
     const setDelivery = useSetAtom(deliveryAtom)
     const setProducts = useSetAtom(productsAtom)
     const productsInOrder = useAtomValue(productsInOrderAtom)
@@ -106,10 +106,6 @@ export default function Page({orderFromDb, delivery, products}: {orderFromDb: IO
         setDelivery(delivery)
         setProducts(products)
     }, [])
-    
-    useEffect(() => {
-        console.log(order)
-    })
 
     const isModalForDeletingOpened = useState(false)
     return(

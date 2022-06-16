@@ -9,5 +9,5 @@ module.exports = withBundleAnalyzer({
   },
   env: {
     AXIOS_URL: process.env.NEXTAUTH_URL
-  },
+  }
 });

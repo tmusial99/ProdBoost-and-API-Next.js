@@ -46,7 +46,7 @@ export default function Page({apiKey, userIsAdmin, allOrdersFromDb}: {apiKey: st
         { title: 'Zamówienia', href: '' }
     ]
     const openedModalForAPI = useState(false);
-    const [allOrders, setAllOrders] = useAtom(allOrdersAtom);
+    const setAllOrders = useSetAtom(allOrdersAtom);
     useEffect(() => {
         setAllOrders(allOrdersFromDb);
     },[])
