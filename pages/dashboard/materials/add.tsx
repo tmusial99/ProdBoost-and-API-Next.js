@@ -7,7 +7,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CirclePlus, Trash } from "tabler-icons-react";
 import Head from "../../../components/Head";
-import WithAuth from "../../../components/hoc/WithAuth";
 import Navbar from "../../../components/Navbar";
 import Navigation from "../../../components/Navigation";
 import axios from "../../../lib/axios";
