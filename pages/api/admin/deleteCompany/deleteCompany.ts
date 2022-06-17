@@ -12,7 +12,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         const {client, db} = await getDatabase()
-        await db.collection('companies').deleteOne({companyId: new ObjectId(session.user.companyId)})
+        await db.collection('companies').deleteOne({_id: new ObjectId(session.user.companyId)})
         await client.close()
         
         res.status(200).json('ok')
