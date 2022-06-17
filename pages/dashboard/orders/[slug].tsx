@@ -1,8 +1,8 @@
-import { Box, Button, Center, Container, Divider, Group, LoadingOverlay, Modal, ScrollArea, Select, Table, Text, TextInput } from "@mantine/core";
+import { Button, Container, Divider, Group, LoadingOverlay, Modal, ScrollArea, Select, Table, Text, TextInput } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { CheckIcon } from "@modulz/radix-icons";
 import { AxiosError } from "axios";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { ObjectId } from "mongodb";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
@@ -22,10 +22,18 @@ const orderAtom = atom<IOrder & {_id: string} | null>(null)
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(!session?.user.permissions.includes('orders')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('orders')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }
@@ -192,7 +200,7 @@ function Form(){
 
     return(
         <>
-            <LoadingOverlay visible={sendingData}/>
+            <LoadingOverlay visible={sendingData} sx={{position:'fixed'}}/>
             <Group direction="column" grow mx='auto' mt={20} spacing={0} sx={{maxWidth: '600px'}}>
                 <Group grow noWrap align='flex-end'>
                     <Select sx={{maxWidth: '100%'}} label='Status zamówienia' data={deliveryStatuses} value={selectedStatus as string} onChange={(value) => setSelectedStatus(value as string)}/>

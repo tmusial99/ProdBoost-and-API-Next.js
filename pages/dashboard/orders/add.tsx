@@ -21,10 +21,18 @@ import { AxiosError } from "axios";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(!session?.user.permissions.includes('orders')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('orders')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }
@@ -255,8 +263,8 @@ export default function Page({allProducts, deliveryOptions, isAdmin}: {allProduc
                     )}
 
                     <Title order={2} mt={40}>Wszystkie produkty</Title>
-                    {allProducts.length === 0 && (<Text align='center' mt={20}>Nie znaleziono żadnych produktów.</Text>)}
-                    {allProducts.length > 0 && (
+                    {products.length === 0 && (<Text align='center' mt={20}>Nie znaleziono żadnych produktów.</Text>)}
+                    {products.length > 0 && (
                         <>
                             <TextInput mt={20} mx='auto' placeholder="Szukaj produktów..." icon={<Search/>} type='search' radius='xl' value={searchValue} onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%'}}/>
                             <ScrollArea type='always'>
@@ -356,8 +364,8 @@ export default function Page({allProducts, deliveryOptions, isAdmin}: {allProduc
                                 </tbody>
                             </Table>
                         </ScrollArea>
-                        <Group position='center' align='flex-end' mt={15}>
-                            <Select label='Dodaj metodę dostawy' data={Object.values(deliveryState[0]).map(x => ({label: `${x.label} - ${x.brutto.toFixed(2)} zł`, value: `${x.id}`}))} value={selectedDelivery} onChange={(value) => setSelectedDelivery(value as string)}/>
+                        <Group position='center' align='flex-end' mt={15} mx='auto' noWrap sx={{maxWidth: '600px'}}>
+                            <Select label='Dodaj metodę dostawy' data={Object.values(deliveryState[0]).map(x => ({label: `${x.label} - ${x.brutto.toFixed(2)} zł`, value: `${x.id}`}))} value={selectedDelivery} onChange={(value) => setSelectedDelivery(value as string)} sx={{width: '100%'}}/>
                             {isAdmin && (<Button onClick={() => modalForEditingDeliveryOpened[1](true)}>Edytuj</Button>)}
                         </Group>
                         <Form selectedDelivery={parseInt(selectedDelivery)} deliveryState={deliveryState[0]} basket={basket} quantityOfItemsInBasket={quantityOfItemsInBasket} form={form}/>
@@ -422,7 +430,7 @@ function Form({deliveryState, selectedDelivery, basket, quantityOfItemsInBasket,
 
     return(
         <>
-            <LoadingOverlay visible={sendingData}/>
+            <LoadingOverlay visible={sendingData} sx={{position:'fixed'}}/>
             <Group direction="column" grow mx='auto' mt={20} spacing={0} sx={{maxWidth: '600px'}}>
                 <Divider size='md' label='Dane kontaktowe'/>
                 <Group grow mb={5}>

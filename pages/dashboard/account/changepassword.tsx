@@ -1,23 +1,29 @@
 import { Alert, Button, Container, Group, LoadingOverlay, Modal, PasswordInput, Text, Title } from "@mantine/core"
 import { useSetState } from "@mantine/hooks";
 import { AxiosError } from "axios";
-import { signOut } from "next-auth/react";
+import { GetServerSideProps } from "next";
+import { getSession, signOut } from "next-auth/react";
 import { FormEvent, useState } from "react";
 import { AlertCircle, Key, Login } from "tabler-icons-react";
 import Head from "../../../components/Head";
-import WithAuth from "../../../components/hoc/WithAuth";
 import Navbar from "../../../components/Navbar"
 import Navigation from "../../../components/Navigation";
 import axios from "../../../lib/axios";
 import useFormValidation from "../../../lib/useFormValidation";
 import { PasswordStrength } from "../../register";
 
-export default function Page(){
-    return(
-        <WithAuth>
-            <ChangePassword/>
-        </WithAuth>
-    )
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    const session = await getSession(ctx)
+    if(!session){
+        return {
+            redirect: {
+                destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    
+    return {props: {}}
 }
 
 const items = [
@@ -25,7 +31,7 @@ const items = [
     { title: 'Zmień hasło', href: '' }
 ]
 
-function ChangePassword(){
+export default function Page(){
     const [form, setForm] = useSetState({
         actualPassword: '',
         password: '',
@@ -85,7 +91,7 @@ function ChangePassword(){
             <Head title='ProdBoost - Zmień hasło'/>
             <Navbar/>
             <Container>
-                <LoadingOverlay visible={sendingData}/>
+                <LoadingOverlay visible={sendingData} sx={{position:'fixed'}}/>
                 <ModalAfterSuccess opened={passwordChanged}/>
                 <Navigation items={items}/>
                 <Title order={1} mb={10} align='center'>Zmień hasło</Title>

@@ -2,11 +2,9 @@ import { Box, Button, Center, Divider, Group, Modal, Overlay, Text } from "@mant
 import { showNotification } from "@mantine/notifications";
 import { CheckIcon } from "@modulz/radix-icons";
 import { WithId } from "mongodb";
-import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Minus, Plus, Upload } from "tabler-icons-react";
 import axios from "../lib/axios";
-import { IMaterial } from "../types/items";
 import NumberInputPositiveInt from "./NumberInputPositiveInt";
 
 type Props = {

@@ -9,9 +9,7 @@ export default class _Document extends Document {
   render() {
     return (
       <Html lang='pl-PL'>
-        <Head>
-          <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet"/>
-        </Head>
+        <Head></Head>
         <body>
           <Main />
           <NextScript />

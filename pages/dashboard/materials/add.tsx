@@ -1,6 +1,8 @@
 import { Badge, Button, Container, Group, LoadingOverlay, NumberInput, TextInput, Title, Tooltip } from "@mantine/core";
 import { useSetState } from "@mantine/hooks";
 import { AxiosError } from "axios";
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CirclePlus, Trash } from "tabler-icons-react";
@@ -10,6 +12,30 @@ import Navbar from "../../../components/Navbar";
 import Navigation from "../../../components/Navigation";
 import axios from "../../../lib/axios";
 import { IMaterial } from "../../../types/items";
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    const session = await getSession(ctx)
+    if(!session){
+        return {
+            redirect: {
+                destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('materials')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: {}
+    }
+}
 
 const items = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -59,7 +85,7 @@ export default function Page(){
         }
     }
     return(
-        <WithAuth withPermission='materials'>
+        <>
             <Head title='ProdBoost - Dodaj nowy materiał'/>
             <Navbar/>
             <LoadingOverlay visible={sendingData} sx={{position:'fixed'}}/>
@@ -169,6 +195,6 @@ export default function Page(){
                     <Button mt={20} radius='xl' disabled={!!error.length || !form.name.length || form.quantity === undefined || isNaN(form.quantity)} onClick={() => sendData()}>Dodaj</Button>
                 </Group>
             </Container>
-        </WithAuth>
+        </>
     )
 }

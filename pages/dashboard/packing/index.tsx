@@ -24,10 +24,18 @@ const items = [
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(!session?.user.permissions.includes('packing')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('packing')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }
@@ -83,9 +91,9 @@ export default function Page({JsonPacking}: {JsonPacking: string}){
                 <Title order={1} mb={20} align='center'>Opakowania</Title>
                 <Group position='center'>
                     <Link href='/dashboard/packing/add' passHref>
-                        <Button component='a' radius='xl' leftIcon={<CirclePlus size={22}/>}>Dodaj nowe opakowanie</Button>
+                        <Button component='a' radius='xl' leftIcon={<CirclePlus size={22}/>} sx={{'@media (max-width: 576px)': {minWidth: '100%'}}}>Dodaj nowe opakowanie</Button>
                     </Link>
-                    <TextInput icon={<Search/>} type='search' radius='xl' value={searchValue} onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%'}}/>
+                    <TextInput icon={<Search/>} type='search' radius='xl' value={searchValue} onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%', '@media (max-width: 576px)': {minWidth: '100%'}}}/>
                 </Group>
                 {packing.length === 0 && (<Text align='center' mt={20}>Nie znaleziono żadnych opakowań.</Text>)}
                 {packing.length > 0 && (

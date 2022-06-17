@@ -17,7 +17,7 @@ import getDatabase from "../../../lib/getDatabase";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx);
-    if(!session || !session.user.permissions.includes('orders')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
@@ -25,6 +25,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
             }
         }
     }
+    else if(!session?.user.permissions.includes('orders')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
+                permanent: false
+            }
+        }
+    }
+    
     const {client, db} = await getDatabase()
     const allOrders = await db.collection('orders').find({companyId: new ObjectId(session.user.companyId)}).project({_id: 0, companyId: 0}).toArray()
     
@@ -171,8 +180,18 @@ function ModalForAPI({openedState, apiKeyFromDb}: {openedState: [boolean, Dispat
         
     }
     const reqBody = `{
-    "basket": Array<[productId: number, quantity: number]> (ex. [[1, 10], [2, 15]]),
-    "deliveryId": number (ex. 1),
+    "basket": {
+        "productId": number, 
+        "name": string, 
+        "quantity": number, 
+        "totalNetto": number, 
+        "totalBrutto": number
+    }[],
+    "delivery": {
+        "label": string,
+        "netto": number,
+        "brutto": number
+    },
     "form": {
         "firstName": string (ex. 'Jan'),
         "surname": string (ex. 'Kowalski'),

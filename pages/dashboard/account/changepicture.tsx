@@ -1,22 +1,28 @@
 import { Avatar, Box, Button, Center, Container, Group, Paper, Title } from "@mantine/core"
 import { AxiosError } from "axios";
-import { useSession } from "next-auth/react";
+import { GetServerSideProps } from "next";
+import { getSession, useSession } from "next-auth/react";
 import { useState } from "react";
 import { Trash } from "tabler-icons-react";
 import DropzoneForImages from "../../../components/DropzoneForImages";
 import Head from "../../../components/Head";
-import WithAuth from "../../../components/hoc/WithAuth";
 import Navbar from "../../../components/Navbar"
 import Navigation from "../../../components/Navigation";
 import axios from "../../../lib/axios";
 import { updateSession } from "../../../lib/sessionHelpers";
 
-export default function Page(){
-    return(
-        <WithAuth>
-            <ChangePicture/>
-        </WithAuth>
-    )
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    const session = await getSession(ctx)
+    if(!session){
+        return {
+            redirect: {
+                destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    
+    return {props: {}}
 }
 
 const items = [
@@ -24,7 +30,7 @@ const items = [
     { title: 'Zdjęcie profilowe', href: '' }
 ]
 
-function ChangePicture(){
+export default function Page(){
     const {data:session} = useSession();
     const [deletingPhoto, setDeletingPhoto] = useState(false);
 

@@ -24,10 +24,18 @@ import { IProduct } from "../../../types/items"
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(!session?.user.permissions.includes('products')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('products')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }

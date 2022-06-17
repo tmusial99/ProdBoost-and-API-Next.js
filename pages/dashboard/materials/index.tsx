@@ -24,10 +24,18 @@ const items = [
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(!session?.user.permissions.includes('materials')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('materials')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }
@@ -81,11 +89,11 @@ export default function Page({JsonMaterials}: {JsonMaterials: string}){
             <Container>
                 <Navigation items={items}/>
                 <Title order={1} mb={20} align='center'>Materiały</Title>
-                <Group position='center'>
+                <Group position='center' grow>
                     <Link href='/dashboard/materials/add' passHref>
-                        <Button component='a' radius='xl' leftIcon={<CirclePlus size={22}/>}>Dodaj nowy materiał</Button>
+                        <Button component='a' radius='xl' leftIcon={<CirclePlus size={22}/>} sx={{'@media (max-width: 551px)': {minWidth: '100%'}}}>Dodaj nowy materiał</Button>
                     </Link>
-                    <TextInput icon={<Search/>} type='search' radius='xl' value={searchValue} onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%'}}/>
+                    <TextInput icon={<Search/>} type='search' radius='xl' value={searchValue} placeholder='Szukaj materiałów...' onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%', '@media (max-width: 551px)': {minWidth: '100%'}}}/>
                 </Group>
                 {materials.length === 0 && (<Text align='center' mt={20}>Nie znaleziono żadnych materiałów.</Text>)}
                 {materials.length > 0 && (

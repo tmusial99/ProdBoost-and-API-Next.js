@@ -17,10 +17,18 @@ import useFormValidation from "../../../../lib/useFormValidation";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(session?.user.role !== 'CompanyOwner'){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    if(session?.user.role !== 'CompanyOwner'){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }

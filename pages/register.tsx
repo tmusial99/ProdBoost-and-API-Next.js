@@ -1,16 +1,30 @@
 import { Box, Button, Group, Loader, LoadingOverlay, PasswordInput, Popover, Progress, Stepper, Text, TextInput } from "@mantine/core";
 import { useDebouncedValue, useSetState } from "@mantine/hooks";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Check, X } from "tabler-icons-react";
-import Navbar from "../../components/Navbar";
-import { isItName, transofrmNameOnBlur } from "../../lib/inputHelpers";
-import useFormValidation from "../../lib/useFormValidation";
+import Navbar from "../components/Navbar";
+import { isItName, transofrmNameOnBlur } from "../lib/inputHelpers";
+import useFormValidation from "../lib/useFormValidation";
 import { AxiosError } from "axios";
-import axios from "../../lib/axios"
-import WithoutAuth from "../../components/hoc/WithoutAuth";
-import Head from "../../components/Head";
+import axios from "../lib/axios"
+import Head from "../components/Head";
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    const session = await getSession(ctx)
+    if(session){
+        return {
+            redirect: {
+                destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+
+    return {props: {}}
+}
 
 export default function Register(){
     const [active, setActive] = useState(0);
@@ -19,11 +33,11 @@ export default function Register(){
     const [allValues, setAllValues] = useSetState({})
 
     return (
-        <WithoutAuth>
+        <>
             <Head title='ProdBoost - Rejestracja'/>
             <Navbar/>
             <Group px={20} grow={true} sx={{maxWidth:1000}} mx='auto'>
-                <Stepper active={active} onStepClick={setActive} breakpoint={470} pb={20} mt='lg'>
+                <Stepper active={active} onStepClick={setActive} breakpoint={515} pb={20} mt='lg'>
                     <Stepper.Step label="Dane logowania" allowStepSelect={false} >
                         <Group position='center' align='flex-start' grow={true} sx={{width:'100%'}}>
                             <CreateAccount nextStep={nextStep} setGlobalState={setAllValues}/>
@@ -53,11 +67,10 @@ export default function Register(){
                                 <Button component="a" href="/dashboard">Zaloguj</Button>
                             </Link>
                         </Group>
-                        
                     </Stepper.Completed>
                 </Stepper>
             </Group>
-        </WithoutAuth>
+        </>
     )
 }
 

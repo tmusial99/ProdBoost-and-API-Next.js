@@ -1,4 +1,4 @@
-import { ActionIcon, Anchor, Avatar, Badge, Button, Divider, Group, Menu, Switch, Text, useMantineColorScheme } from '@mantine/core';
+import { ActionIcon, Anchor, Avatar, Badge, Divider, Group, Menu, Switch, Text, useMantineColorScheme } from '@mantine/core';
 import { SunIcon, MoonIcon } from '@modulz/radix-icons';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';

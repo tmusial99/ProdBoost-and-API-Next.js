@@ -1,14 +1,14 @@
-import { Box, Button, Group, Title } from "@mantine/core";
+import { Box, Button, Center, Container, Group, Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { AlertTriangle, ArrowBackUp, Home } from "tabler-icons-react";
 import Head from "../components/Head";
 import Navbar from "../components/Navbar";
 
-export default function NotFound(){
+export default function Page(){
     const router = useRouter()
     return(
         <>
-            <Head title='ProdBoost - Error 404'/>
+            <Head title="ProdBoost - Brak dostępu"/>
             <Navbar/>
             <Box px={10} sx={{
                 display: 'flex',
@@ -19,8 +19,7 @@ export default function NotFound(){
             }}>
                 
                 <AlertTriangle size={80}/>
-                <Title order={1} align='center'>Error 404</Title>
-                <Title order={3} align='center'>Nie znaleziono podanej strony.</Title>
+                <Title order={1} align='center'>Nie masz dostępu do tej strony.</Title>
                 <Group direction="column" grow mt={20}>
                     <Button leftIcon={<ArrowBackUp size={20}/>} onClick={() => router.back()}>Cofnij</Button>
                     <Button leftIcon={<Home size={20}/>} onClick={() => router.replace('/dashboard')}>Przejdź do strony głównej</Button>

@@ -23,10 +23,18 @@ import { IPacking } from "../../../types/items"
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const session = await getSession(ctx)
-    if(!session?.user.permissions.includes('packing')){
+    if(!session){
         return {
             redirect: {
                 destination: '/dashboard',
+                permanent: false
+            }
+        }
+    }
+    else if(!session?.user.permissions.includes('packing')){
+        return {
+            redirect: {
+                destination: '/unauthorized',
                 permanent: false
             }
         }
