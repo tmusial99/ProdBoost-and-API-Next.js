@@ -216,7 +216,7 @@ function ModalForAPI({openedState, apiKeyFromDb}: {openedState: [boolean, Dispat
             onClose={() => openedState[1](false)}
             title={<Text size="xl" weight={500}>Dodaj przez API</Text>}
             size='lg'
-            styles={{modal: {maxWidth: '95vw', margin: 0}, inner: {padding: 0}}}
+            styles={{modal: {maxWidth: '95vw', maxHeight: '95vh', margin: 0}, inner: {padding: 0}}}
         >
             <Group direction="column" grow>
                 <Group grow noWrap position="center" mb={10}>
