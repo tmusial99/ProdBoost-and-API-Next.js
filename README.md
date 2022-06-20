@@ -36,11 +36,11 @@ ProdBoost is a simple and free ERP (Enterprise resource planning) system for sma
 ## Try it out!
 App is live on [https://prodboost.vercel.app/](https://prodboost.vercel.app/dashboard).
 
-You can login with test account credentials:
+You can log in with test account credentials:
 ```
 Username: testUser
 Password: testUser123!
 
 Please be kind to others. Don't change paasword or delete company data.
 ```
-But I highly recommend to create new account to safely test all features. There's no e-mail needed!
+I highly recommend creating new account to safely test all features. There's no e-mail address required!
