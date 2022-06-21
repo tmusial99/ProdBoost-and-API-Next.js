@@ -23,6 +23,7 @@ ProdBoost is a simple and free ERP (Enterprise resource planning) system for sma
 - Using form data to upload files to server and parsing it with [multiparty](https://github.com/pillarjs/multiparty)
 - Validating forms and HTTP request body with [yup schema builder](https://github.com/jquense/yup)
 - That I should pay attention to prop drilling. I found these amazing and easy to use state management packages like [Jotai](https://github.com/pmndrs/jotai) and [Zustand](https://github.com/pmndrs/zustand) that I'm going to use in the future. Amazing job done by [@pmndrs](https://github.com/pmndrs)
+- That I should pay attention to the correct use of HTTP request methods. (I used to forget to use `PUT` or `DELETE` instead of `POST`)
 - That I should use [mongoose](https://github.com/Automattic/mongoose) instead of simple and hard to mantain in bigger projects [MongoDB driver](https://github.com/mongodb/node-mongodb-native)
 
 ## Used technologies
