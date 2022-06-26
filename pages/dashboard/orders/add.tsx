@@ -263,10 +263,10 @@ export default function Page({allProducts, deliveryOptions, isAdmin}: {allProduc
                     )}
 
                     <Title order={2} mt={40}>Wszystkie produkty</Title>
+                    <TextInput mt={20} mx='auto' placeholder="Szukaj produktów..." icon={<Search/>} type='search' radius='xl' value={searchValue} onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%'}}/>
                     {products.length === 0 && (<Text align='center' mt={20}>Nie znaleziono żadnych produktów.</Text>)}
                     {products.length > 0 && (
                         <>
-                            <TextInput mt={20} mx='auto' placeholder="Szukaj produktów..." icon={<Search/>} type='search' radius='xl' value={searchValue} onChange={(e) => setSearchValue(e.target.value)} sx={{maxWidth: '300px', width: '100%'}}/>
                             <ScrollArea type='always'>
                                 <Table fontSize='lg' sx={{minWidth: '720px'}}>
                                     <thead>
